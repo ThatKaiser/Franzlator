@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Franz-Lator Ultimate v9</title>
+    <style>
+      :root {
+        --bg-body: #121212;
+        --bg-container: #1e1e1e;
+        --bg-panel: #252525;
+        --border-color: #333;
+        --accent: #ffcc00;
+        --accent-2: #ffd54f;
+        --text: #ececec;
+        --muted: #aaaaaa;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: var(--bg-body);
+        color: var(--text);
+        margin: 0;
+        padding: 40px 20px;
+        display: flex;
+        justify-content: center;
+      }
+
+      body.nc-mode {
+        background:
+          linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2)),
+          url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFO5BkSgauX3HkYkNdX1Ubd1ziWgMCTj1TXiR293jKLg&s=10') center/cover no-repeat fixed;
+      }
+
+      .translator-container {
+        background: var(--bg-container);
+        max-width: 860px;
+        width: 100%;
+        border-radius: 14px;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+        padding: 24px;
+        border: 1px solid var(--border-color);
+        position: relative;
+        z-index: 1;
+      }
+
+      .header-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 12px;
+        margin-bottom: 18px;
+        gap: 15px;
+      }
+
+      h1 {
+        color: var(--accent);
+        margin: 0;
+        font-size: 24px;
+        text-align: center;
+        flex-grow: 1;
+      }
+
+      h1 span {
+        display: block;
+        font-size: 14px;
+        color: var(--muted);
+        margin-top: 4px;
+        font-weight: normal;
+      }
+
+      .icon-stack {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .settings-btn {
+        background: transparent;
+        color: var(--accent);
+        border: 1px solid var(--accent);
+        padding: 10px 12px;
+        width: auto;
+        margin: 0;
+        border-radius: 999px;
+        font-size: 18px;
+        line-height: 1;
+      }
+
+      .settings-btn:hover {
+        background: rgba(255, 204, 0, 0.16);
+      }
+
+      .sc-flag {
+        width: 58px;
+        height: 38px;
+        background-color: #003366;
+        border-radius: 4px;
+        position: relative;
+        flex-shrink: 0;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+
+      .sc-flag::before {
+        content: "";
+        position: absolute;
+        top: 4px;
+        left: 6px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        box-shadow: -3px 3px 0 0 #fff;
+        transform: rotate(-20deg);
+      }
+
+      .sc-flag::after {
+        content: "🌴";
+        position: absolute;
+        font-size: 15px;
+        bottom: 4px;
+        left: 20px;
+        line-height: 1;
+      }
+
+      .de-flag {
+        width: 58px;
+        height: 38px;
+        display: flex;
+        flex-direction: column;
+        border-radius: 4px;
+        overflow: hidden;
+        flex-shrink: 0;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      }
+
+      .de-flag .stripe {
+        flex: 1;
+        width: 100%;
+      }
+
+      .stripe.black { background-color: #000; }
+      .stripe.red { background-color: #dd0000; }
+      .stripe.gold { background-color: var(--accent); }
+
+      .sc-flag.spin {
+        animation: spinFlag 1s linear infinite;
+      }
+
+      @keyframes spinFlag {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      #settingsPanel {
+        display: none;
+        background: var(--bg-panel);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 14px;
+        margin-bottom: 16px;
+      }
+
+      .settings-grid {
+        display: grid;
+        gap: 12px;
+      }
+
+      .settings-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .settings-row label {
+        text-transform: none;
+        letter-spacing: 0;
+        font-size: 14px;
+        margin: 0;
+        color: var(--text);
+      }
+
+      .settings-row small {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .range-shell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        max-width: 280px;
+      }
+
+      .flag-pill {
+        font-size: 18px;
+        line-height: 1;
+        filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
+      }
+
+      input[type="range"] {
+        width: 100%;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 10px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #001f3f 0%, #0b1f3a 30%, #05070b 100%);
+        outline: none;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.25);
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background-color: #fff;
+        background-image: var(--thumb-image, none);
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        cursor: pointer;
+      }
+
+      input[type="range"]::-moz-range-thumb {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background-color: #fff;
+        background-image: var(--thumb-image, none);
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        cursor: pointer;
+      }
+
+      .boxes {
+        display: flex;
+        gap: 20px;
+      }
+
+      .box-wrapper {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      label {
+        font-weight: bold;
+        color: #aaa;
+        margin-bottom: 8px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      textarea {
+        width: 100%;
+        height: 160px;
+        padding: 14px;
+        border: 1px solid #444;
+        border-radius: 8px;
+        resize: none;
+        font-size: 16px;
+        box-sizing: border-box;
+        outline: none;
+        background-color: #2d2d2d;
+        color: #fff;
+      }
+
+      textarea:focus {
+        border-color: var(--accent);
+      }
+
+      #output {
+        background-color: #252525;
+        color: var(--accent);
+        font-weight: 500;
+      }
+
+      button {
+        background-color: var(--accent);
+        color: #121212;
+        border: none;
+        padding: 14px 24px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 20px;
+        width: 100%;
+        transition: background 0.2s;
+        text-transform: uppercase;
+      }
+
+      button:hover {
+        background-color: #e6b800;
+      }
+
+      .helper-text {
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+        text-align: center;
+      }
+
+      .spider {
+        position: fixed;
+        top: -40px;
+        font-size: 24px;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.75;
+        animation: spiderCrawl linear forwards;
+        filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.25));
+      }
+
+      @keyframes spiderCrawl {
+        to {
+          transform: translateY(calc(100vh + 70px));
+        }
+      }
+
+      .lee-modal {
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.82));
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 5;
+        padding: 20px;
+      }
+
+      .lee-modal-content {
+        position: relative;
+        z-index: 1;
+        background: rgba(30, 30, 30, 0.9);
+        border: 2px solid var(--accent);
+        border-radius: 12px;
+        padding: 24px;
+        max-width: 420px;
+        width: 100%;
+        color: #fff;
+        text-align: center;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      .shades {
+        width: 100%;
+        max-width: 240px;
+        height: auto;
+        margin: 0 auto 12px;
+        display: block;
+        transform: translateY(-80px);
+        opacity: 0;
+        border-radius: 10px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+      }
+
+      .lee-quote {
+        margin: 12px 0 16px;
+        font-style: italic;
+        color: var(--accent-2);
+        line-height: 1.5;
+      }
+
+      .lee-modal-close {
+        margin-top: 8px;
+        width: auto;
+        padding: 10px 16px;
+        text-transform: none;
+      }
+
+      @keyframes dropShades {
+        0% {
+          transform: translateY(-80px);
+          opacity: 0;
+        }
+        100% {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .boxes {
+          flex-direction: column;
+        }
+        .header-wrapper {
+          padding-bottom: 8px;
+        }
+        h1 {
+          font-size: 20px;
+        }
+        .sc-flag, .de-flag {
+          width: 45px;
+          height: 30px;
+        }
+        .sc-flag::after {
+          font-size: 12px;
+          left: 14px;
+          bottom: 3px;
+        }
+        .sc-flag::before {
+          width: 9px;
+          height: 9px;
+          top: 3px;
+          left: 4px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container" class="translator-container">
+      <div class="header-wrapper">
+        <div id="scFlag" class="sc-flag" aria-hidden="true"></div>
+        <h1>
+          Franz-Lator Ultimate v9
+          <span>English ➔ Franz Denglish</span>
+        </h1>
+        <div class="icon-stack">
+          <button class="settings-btn" type="button" onclick="toggleSettingsPanel()" aria-label="Open settings">⚙</button>
+          <div class="de-flag" aria-hidden="true">
+            <div class="stripe black"></div>
+            <div class="stripe red"></div>
+            <div class="stripe gold"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="settingsPanel">
+        <div class="settings-grid">
+          <div class="settings-row">
+            <label for="accentRange">Accent Heaviness</label>
+            <div class="range-shell">
+              <span class="flag-pill" aria-hidden="true">SC</span>
+              <input id="accentRange" type="range" min="0" max="2" value="1" step="1" />
+              <span class="flag-pill" aria-hidden="true">DE</span>
+            </div>
+            <small id="accentLabel">The Full Franz</small>
+          </div>
+          <div class="settings-row">
+            <label for="ncToggle">North Carolinan Mode (Fremmel)</label>
+            <input id="ncToggle" type="checkbox" onchange="toggleNCMode()" />
+          </div>
+          <div class="settings-row">
+            <label for="duckToggle">Duck Mode (Quack Sound)</label>
+            <input id="duckToggle" type="checkbox" />
+          </div>
+          <div class="settings-row">
+            <label>Hartsville Clock</label>
+            <div>
+              <div id="hartsvilleTime">00:00:00 AM</div>
+              <small id="clockAlert">Arbeitzeit (Working Hours)</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="boxes">
+        <div class="box-wrapper">
+          <label for="input">Normal English Input</label>
+          <textarea id="input" placeholder="Type English text here..."></textarea>
+        </div>
+
+        <div class="box-wrapper">
+          <label for="output">Franz Speech Output</label>
+          <textarea id="output" readonly placeholder="Your Franz translation will appear here..." aria-live="polite"></textarea>
+        </div>
+      </div>
+
+      <button type="button" onclick="translateToFranz()">Translate to Franz</button>
+      <p class="helper-text">Tip: press Ctrl/Cmd + Enter to translate instantly.</p>
+    </div>
+
+    <div id="leeModal" class="lee-modal" onclick="closeLeeModal()">
+      <div class="lee-modal-content" onclick="event.stopPropagation()">
+        <img id="shadesObj" class="shades" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhmfEYoZZsZLjk-sWgL7gCt0jLnLwRJrdpyCAslsCo4A&s=10" alt="General Lee" />
+        <h2>Oh i wish I was in the land of cotton</h2>
+        <p class="lee-quote">“Hold onto your Sudmarks, boys! General Lee und Bismarck are going to make the South rise again!”<br><strong>-Franz</strong></p>
+        <button class="lee-modal-close" type="button" onclick="closeLeeModal()">Close</button>
+      </div>
+    </div>
+
+    <script>
+      const exactPhrases = [
+        { eng: "i don't care", franz: "zät is sausage to me" },
+        { eng: "it doesn't matter", franz: "zät is sausage to me" },
+        { eng: "i don't understand", franz: "Ich only understand train station" },
+        { eng: "i have no idea", franz: "Ich have keine Ahnung" },
+        { eng: "you are annoying", franz: "you are walking on my cookie" },
+        { eng: "get on my nerves", franz: "walk on my cookie" },
+        { eng: "this is wild", franz: "da steppt der Bär" },
+        { eng: "this is crazy", franz: "da steppt der Bär" },
+        { eng: "my friend", franz: "mein Freund" },
+        { eng: "good morning", franz: "Guten Morgen" },
+        { eng: "good night", franz: "Gute Nacht" },
+        { eng: "oh my god", franz: "Mein Gott" }
+      ];
+
+      const wordSwaps = {
+        i: "Ich",
+        oh: "Ach",
+        hello: "Hallo",
+        hey: "Hallo",
+        hi: "Hallo",
+        bye: "Tschüss",
+        goodbye: "Auf Wiedersehen",
+        yes: "Ja",
+        no: "Nein",
+        exactly: "Genau",
+        please: "Bitte",
+        thanks: "Danke",
+        thank: "danke",
+        but: "aber",
+        maybe: "vielleicht",
+        and: "und",
+        is: "ist",
+        not: "nicht",
+        here: "hier",
+        man: "Mann",
+        house: "Haus",
+        friend: "Freund",
+        problem: "Problem",
+        cat: "Katze",
+        dog: "Hund",
+        beer: "Bier",
+        water: "Wasser"
+      };
+
+      let videoOpened = false;
+      let spiderTimeout = null;
+      let audioCtx = null;
+      let duckAudio = null;
+      const thumbFlagImages = {
+        0: "url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXOeBsa60-QK3D-OrIqcy6E966Vx5nFMsI5IuVbCKHnw&s=10')",
+        1: "url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNCGLdpbJ5a8k8gNKYA0gtEDWwWHd8fyk4HSO297c8ig&s=10')",
+        2: "url('data:image/png;base64,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')"
+      
+      };
+
+      function initAudio() {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      }
+
+      function playQuack() {
+        if (!duckAudio) {
+          duckAudio = new Audio('https://www.myinstants.com/media/sounds/mac-quack.mp3');
+          duckAudio.preload = 'auto';
+        }
+
+        duckAudio.currentTime = 0;
+        duckAudio.volume = 0.45;
+        duckAudio.play().catch(() => {});
+      }
+
+      function updateAccentThumb() {
+        const slider = document.getElementById('accentRange');
+        const value = parseInt(slider.value, 10);
+        slider.style.setProperty('--thumb-image', thumbFlagImages[value] || 'none');
+      }
+
+      function toggleSettingsPanel() {
+        initAudio();
+        const panel = document.getElementById('settingsPanel');
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+      }
+
+      function toggleNCMode() {
+        const isNC = document.getElementById('ncToggle').checked;
+        document.body.classList.toggle('nc-mode', isNC);
+        if (isNC && document.getElementById('duckToggle').checked) {
+          playQuack();
+        }
+        translateToFranz();
+      }
+
+      function handleInput() {
+        if (document.getElementById('duckToggle').checked) {
+          playQuack();
+        }
+        checkEasterEggs();
+        translateToFranz();
+      }
+
+      function updateHartsvilleClock() {
+        const options = {
+          timeZone: 'America/New_York',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        };
+        const formatter = new Intl.DateTimeFormat([], options);
+        document.getElementById('hartsvilleTime').innerText = formatter.format(new Date());
+
+        const hourOptions = { timeZone: 'America/New_York', hour: '2-digit', hour12: false };
+        const currentHour = parseInt(new Intl.DateTimeFormat([], hourOptions).format(new Date()), 10);
+        const alertLabel = document.getElementById('clockAlert');
+
+        if (currentHour >= 22 || currentHour < 6) {
+          alertLabel.innerText = 'RUHEZEIT! (Quiet Hours Active)';
+          alertLabel.style.color = '#ff4444';
+        } else if (currentHour >= 17) {
+          alertLabel.innerText = 'FEIERABEND! (Rest Time)';
+          alertLabel.style.color = '#ffcc00';
+        } else {
+          alertLabel.innerText = 'Arbeitzeit (Working Hours)';
+          alertLabel.style.color = '#44ff44';
+        }
+      }
+
+      setInterval(updateHartsvilleClock, 1000);
+      updateHartsvilleClock();
+
+      function checkEasterEggs() {
+        const inputVal = document.getElementById('input').value.trim().toLowerCase();
+        const container = document.getElementById('container');
+        const outputBox = document.getElementById('output');
+        const scFlag = document.getElementById('scFlag');
+
+        container.style.background = 'var(--bg-container)';
+        container.style.borderColor = 'var(--border-color)';
+        if (inputVal !== 'bless your heart') {
+          scFlag.classList.remove('spin');
+        }
+
+        if (inputVal === 'south carolina is best carolina') {
+          if (!videoOpened) {
+            window.open('https://www.youtube.com', '_blank');
+            videoOpened = true;
+          }
+        } else {
+          videoOpened = false;
+        }
+
+        if (inputVal.includes('north carolina') && !document.getElementById('ncToggle').checked) {
+          container.style.background = '#5c0606';
+          container.style.borderColor = '#ff0000';
+          outputBox.value = 'Vat did you just say?! Ve do nicht speak of zät Place hier!';
+        }
+
+        if (inputVal === 'i think i spider' && !spiderTimeout) {
+          spawnSpiders();
+          spiderTimeout = setTimeout(() => {
+            spiderTimeout = null;
+          }, 4000);
+        }
+
+        if (inputVal === 'bless your heart') {
+          scFlag.classList.add('spin');
+          outputBox.value = 'Ach, zät is nice, but Ich know vat you really mean!';
+        }
+
+        if (inputVal === 'the south shall rise again') {
+          triggerLeeModal();
+        }
+      }
+
+      function triggerLeeModal() {
+        const modal = document.getElementById('leeModal');
+        const shades = document.getElementById('shadesObj');
+        modal.style.display = 'flex';
+        shades.style.animation = 'none';
+        shades.offsetHeight;
+        shades.style.animation = 'dropShades 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s forwards';
+        document.getElementById('output').value = 'Keep your Sudmarks boys, the South vill rise again?';
+      }
+
+      function closeLeeModal() {
+        document.getElementById('leeModal').style.display = 'none';
+      }
+
+      function spawnSpiders() {
+        for (let i = 0; i < 18; i++) {
+          setTimeout(() => {
+            const spider = document.createElement('div');
+            spider.className = 'spider';
+            spider.innerText = '🕷️';
+            spider.style.left = `${Math.random() * window.innerWidth}px`;
+            const speed = (Math.random() * 2 + 3).toFixed(2);
+            spider.style.animationDuration = `${speed}s`;
+            document.body.appendChild(spider);
+            setTimeout(() => spider.remove(), parseFloat(speed) * 1000);
+          }, i * 150);
+        }
+      }
+
+      function escapeRegExp(value) {
+        return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+
+      function translateToFranz() {
+        let text = document.getElementById('input').value;
+        const lowerText = text.toLowerCase().trim();
+        const outputBox = document.getElementById('output');
+
+        if (document.getElementById('ncToggle').checked) {
+          if (!text.trim()) {
+            outputBox.value = '';
+            return;
+          }
+          const tokens = text.split(/(\s+)/);
+          const converted = tokens.map((token) => {
+            if (token.trim().length > 0 && !/^[.,!?;:]+$/.test(token.trim())) {
+              return token.charAt(0) === token.charAt(0).toUpperCase() ? 'Fremmel' : 'fremmel';
+            }
+            return token;
+          });
+          outputBox.value = converted.join('');
+          return;
+        }
+
+        if (lowerText.includes('north carolina')) {
+          outputBox.value = 'Vat did you just say?! Ve do nicht speak of zät Place hier!';
+          return;
+        }
+
+        if (lowerText === 'bless your heart') {
+          outputBox.value = 'Ach, zät is nice, but Ich know vat you really mean!';
+          return;
+        }
+
+        if (lowerText === 'the south shall rise again') {
+          triggerLeeModal();
+          outputBox.value = 'Keep your Sudmarks boys, the South vill rise again?';
+          return;
+        }
+
+        if (!text.trim()) {
+          outputBox.value = '';
+          return;
+        }
+
+        const level = parseInt(document.getElementById('accentRange').value, 10);
+        const labels = ['American Tourist', 'The Full Franz', 'Octoberfest Overdrive'];
+        document.getElementById('accentLabel').innerText = labels[level];
+
+        if (level >= 1) {
+          exactPhrases.forEach((item) => {
+            const regex = new RegExp(`\\b${escapeRegExp(item.eng)}\\b`, 'gi');
+            text = text.replace(regex, item.franz);
+          });
+        }
+
+        const tokens = text.split(/(\s+|[.,!?;:_/()#@.-])/);
+        for (let i = 0; i < tokens.length; i++) {
+          const token = tokens[i];
+          const cleanToken = token.trim().toLowerCase();
+
+          if (!cleanToken) {
+            continue;
+          }
+
+          if (wordSwaps[cleanToken] && level >= 1) {
+            let replacement = wordSwaps[cleanToken];
+            if (cleanToken === 'i') {
+              replacement = 'Ich';
+            } else if (cleanToken === 'oh' && token === 'OH') {
+              replacement = 'ACH';
+            } else if (token.charAt(0) === token.charAt(0).toUpperCase()) {
+              replacement = replacement.charAt(0).toUpperCase() + replacement.slice(1);
+            }
+            tokens[i] = replacement;
+          } else if (cleanToken.length > 0) {
+            let word = token;
+
+            if (level >= 1) {
+              word = word.replace(/th/g, 'z').replace(/Th/g, 'Z').replace(/TH/g, 'Z');
+              word = word.replace(/\bw/g, 'v').replace(/\bW/g, 'V');
+            }
+
+            if (level === 2) {
+              word = word.replace(/s\b/gi, 'ss').replace(/v/gi, 'ff');
+              if (word.toLowerCase() === 'you') word = 'du';
+              if (word.toLowerCase() === 'the') word = 'die';
+            }
+
+            const structuralWords = ['a', 'an', 'to', 'for', 'in', 'on', 'at', 'by', 'of', 'from', 'is', 'am', 'are', 'was', 'were', 'be', 'been', 'ist', 'nicht', 'und', 'aber', 'vielleicht', 'zät', 'ziz', 'viz', 'vere', 'vhy', 'vat'];
+            if (word.length > 2 && !structuralWords.includes(word.toLowerCase()) && !/^[.,!?;:]+$/.test(word)) {
+              word = word.charAt(0).toUpperCase() + word.slice(1);
+            }
+
+            tokens[i] = word;
+          }
+        }
+
+        outputBox.value = tokens.join('');
+      }
+
+      document.getElementById('input').addEventListener('input', handleInput);
+      document.getElementById('input').addEventListener('keydown', (event) => {
+        if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+          event.preventDefault();
+          translateToFranz();
+        }
+      });
+      document.getElementById('accentRange').addEventListener('input', () => {
+        const labels = ['American Tourist', 'The Full Franz', 'Octoberfest Overdrive'];
+        const value = parseInt(document.getElementById('accentRange').value, 10);
+        document.getElementById('accentLabel').innerText = labels[value];
+        updateAccentThumb();
+        translateToFranz();
+      });
+      document.getElementById('duckToggle').addEventListener('change', handleInput);
+      updateAccentThumb();
+    </script>
+  </body>
+</html>
